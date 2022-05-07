@@ -14,22 +14,14 @@ var people = [
   { id: 6, username: "E", active: true,  age: 95, uid: 1000 }
 ];
 
-var startingData = [
-  [["groucho", "marx", 1990], ["firstName", "lastName", "born"]],
-  [["chico",   "marx", 1987], ["firstName", "lastName", "born"]],
-  [["zeppo",   "marx", 2001], ["firstName", "lastName", "born"]],
-  [["harpo",   "marx", 1988], ["firstName", "lastName", "born"]],
-  [["gummo",   "marx", 1992], ["firstName", "lastName", "born"]]
-];
 // ```
 
 // - Log out 30 random numbers between 20 and 100
-console.log(_.sample(_.range(2,100), 30));
+console.log(_.sample(_.range(20,100), 30));
 // - Create a function that can only ever be called once
 const initialize = function(){
     _.once(console.log("Hello World"))
 };
-initialize();
 // - Append a paragraph tag to the body for every person in ` people `. It should end up looking something like this - ` <p> Hello A, you don't look a day over 20 </p> `
 _.each(people, function(person){
     const para = document.createElement("p");
@@ -43,6 +35,13 @@ _.each(people, function(person){
 
 // Eventually we want five console.logs that look like the following...
 
+var startingData = [
+    [["groucho", "marx", 1990], ["firstName", "lastName", "born"]],
+    [["chico",   "marx", 1987], ["firstName", "lastName", "born"]],
+    [["zeppo",   "marx", 2001], ["firstName", "lastName", "born"]],
+    [["harpo",   "marx", 1988], ["firstName", "lastName", "born"]],
+    [["gummo",   "marx", 1992], ["firstName", "lastName", "born"]]
+  ];
 // ```
 // Groucho Marx was born in 1890.
 // Chico Marx was born in 1887.
@@ -50,15 +49,10 @@ _.each(people, function(person){
 // Harpo Marx was born in 1888.
 // Gummo Marx was born in 1892.
 // ```
-
 // You'll need to rearrange the data firstly, then alter the data, then print it out. 
-
 // ### A few hints
-
 // Have a think before you read these!
-
 // - The following functions could be helpful
-
 //   ```js
 //   _.chain();
 //   _.map();
@@ -76,7 +70,8 @@ _.each(people, function(person){
 //   ```js
 //   // This...
 //   [["groucho", "marx", 1990], ["firstName", "lastName", "born"]]
-
+const firstStep =_.map(startingData,function(arr){return _.unzip(arr)});
+console.log(firstStep);
 //   // Needs to become this...
 //   [["groucho", "firstName"], ["marx", "lastName"], [1990, "born"]]
 //   ```
@@ -84,7 +79,8 @@ _.each(people, function(person){
 //   ```js
 //   // This...
 //   [["groucho", "firstName"], ["marx", "lastName"], [1990, "born"]]
-
+const secondStep = _.map(firstStep, function(arr){return _.object(arr)});
+console.log(secondStep);
 //   // Needs to become this...
 //   { 1990: "born", groucho: "firstName", marx: "lastName" }
 //   ```
@@ -92,7 +88,8 @@ _.each(people, function(person){
 //   ```js
 //   // This...
 //   { 1990: "born", groucho: "firstName", marx: "lastName" }
-
+const thirdStep = _.map(secondStep, function(arr) {return _.invert(arr)});
+console.log(thirdStep);
 //   // Needs to become this...
 //   { born: "1990", firstName: "groucho", lastName: "marx" }
 //   ```
@@ -100,6 +97,19 @@ _.each(people, function(person){
 //   ```js
 //   // This...
 //   { born: "1990", firstName: "groucho", lastName: "marx" }
+const fourStep = _.map(thirdStep, function(obj) {
+    return _.mapObject(obj, function(val, key) {
+        console.log(val);
+        if (!_.isNaN(Number(val))){
+            console.log(val-100);
+            return val-100;
+        }else{
+        return val[0].toUpperCase() + val.substring(1)
+        }
+    })
+});
+
+console.log(fourStep);
 
 //   // Needs to become this...
 //   { born: 1890, firstName: "Groucho", lastName: "Marx" }
@@ -108,6 +118,16 @@ _.each(people, function(person){
 //   ```js
 //   // This...
 //   { born: 1890, firstName: "Groucho", lastName: "Marx" }
+const list = document.createElement('ul');
+const para = document.createElement("li");
+document.body.appendChild(list);
+const result = document.getElementById('result');
+let template = _.template("<%= firstName%> <%=lastName%> was born in <%=born%>. ");
+_.each(fourStep, function(obj) {
+    const para = document.createElement("li");
+    document.body.appendChild(para);
+    para.append(template({firstName :obj.firstName, lastName : obj.lastName, born: obj.born}));
+});
 
 //   // Needs to be used to create a string that looks like this...
 //   "Groucho Marx was born in 1890."
